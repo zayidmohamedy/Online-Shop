@@ -55,16 +55,14 @@ Many more....
 
  
  ## Author Contact
-  Contact me with any questions!<br>
+[zayidmohamed](https://github.com/zayidmohamedy) and 
+  [safiyoow](https://github.com/safiyoow)
 
-  Email: sayidka843@gmail.com
- 
 
   ## License
   This project is [MIT](https://choosealicense.com/licenses/mit/) licensed.<br />
 <hr>
-  Copyright © 2023 [zayidmohamed](https://github.com/zayidmohamedy) & 
-  [safiyoow](https://github.com/safiyoow)
+  Copyright © 2023 d56 DIU
   
 <p style="text-align:center">Thank You so much for your time !!!</p>
 #
