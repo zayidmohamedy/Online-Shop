@@ -235,11 +235,11 @@
                             <div class="product-content">
                                 <h3><a href="{{route('product-detail',$product->slug)}}">{{$product->title}}</a></h3>
                                 <div class="product-price">
-                                    <span class="old">Tk{{number_format($product->price,2)}}</span>
+                                    <span class="old">Tk{{number_format($product->price,1)}}</span>
                                     @php
                                     $after_discount=($product->price-($product->price*$product->discount)/100)
                                     @endphp
-                                    <span>Tk{{number_format($after_discount,2)}}</span>
+                                    <span>Tk{{number_format($after_discount,1)}}</span>
                                 </div>
                             </div>
                         </div>
@@ -287,7 +287,7 @@
                                 <div class="col-lg-6 col-md-6 col-12 no-padding">
                                     <div class="content">
                                         <h4 class="title"><a href="#">{{$product->title}}</a></h4>
-                                        <p class="price with-discount">Tk{{number_format($product->discount,2)}}</p>
+                                        <p class="price with-discount">Tk{{number_format($product->price,2)}}</p>
                                     </div>
                                 </div>
                                 </div>
