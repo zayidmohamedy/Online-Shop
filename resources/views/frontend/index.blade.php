@@ -247,7 +247,7 @@
                                     @php
                                     $discount=($product->discount);
                                     @endphp
-                                    <span class="text-success">{{number_format($discount)}}%</span>
+                                    <span style="padding-left:4%" class="text-success">{{number_format($discount)}}%</span>
                                 </div>
                             </div>
                         </div>
