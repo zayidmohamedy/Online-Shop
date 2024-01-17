@@ -145,7 +145,11 @@
                                                     $after_discount=($product->price-($product->price*$product->discount)/100);
                                                 @endphp
                                                 <span>Tk{{number_format($after_discount,2)}}</span>
-                                                <del style="padding-left:4%;">Tk{{number_format($product->price,2)}}</del>
+                                                @php
+                                                $discount=($product->discount);
+                                                @endphp
+                                                 
+                                                <span style="padding-left:4%; " class="text-success">{{number_format($product->discount)}}%</span>
                                             </div>
                                         </div>
                                     </div>
@@ -235,11 +239,15 @@
                             <div class="product-content">
                                 <h3><a href="{{route('product-detail',$product->slug)}}">{{$product->title}}</a></h3>
                                 <div class="product-price">
-                                    <span class="old">Tk{{number_format($product->price,1)}}</span>
+                                    
                                     @php
                                     $after_discount=($product->price-($product->price*$product->discount)/100)
                                     @endphp
                                     <span>Tk{{number_format($after_discount,1)}}</span>
+                                    @php
+                                    $discount=($product->discount);
+                                    @endphp
+                                    <span class="text-success">{{number_format($discount)}}%</span>
                                 </div>
                             </div>
                         </div>
