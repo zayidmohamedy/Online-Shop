@@ -59,7 +59,7 @@
 									<li>@foreach($settings as $data) {{$data->phone}} @endforeach</li>
 								</ul>
 							</div>
-						 
+							 
 						</div>
 						<!-- End Single Widget -->
 					</div>
