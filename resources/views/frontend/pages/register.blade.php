@@ -43,6 +43,24 @@
                                 </div>
                                 <div class="col-12">
                                     <div class="form-group">
+                                        <label>Your Phone Number<span>*</span></label>
+                                        <input type="text" name="phone_number" placeholder="" required="required" value="{{ old('phone_number') }}">
+                                        @error('phone_number')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label>Your ID<span>*</span></label>
+                                        <input type="text" name="id_number" placeholder="" required="required" value="{{ old('id_number') }}">
+                                        @error('id_number')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-group">
                                         <label>Your Email<span>*</span></label>
                                         <input type="text" name="email" placeholder="" required="required" value="{{old('email')}}">
                                         @error('email')

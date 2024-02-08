@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
+
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Foundation\Auth\VerifiesEmails;
 use Illuminate\Http\Request;
 use Socialite;
 use App\User;
@@ -22,7 +24,7 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers;
+    use AuthenticatesUsers,VerifiesEmails;
 
     /**
      * Where to redirect users after login.
@@ -38,7 +40,7 @@ class LoginController extends Controller
      */
 
     public function credentials(Request $request){
-        return ['email'=>$request->email,'password'=>$request->password,'status'=>'active','role'=>'admin'];
+        return ['email'=>$request->email,'password'=>$request->password,'status'=>'active','role'=>'user'];
     }
     public function __construct()
     {
@@ -70,4 +72,26 @@ class LoginController extends Controller
          return redirect()->route('home');
         }
     }
+        protected function redirectTo()
+    {
+        if (! auth()->user()->hasVerifiedEmail()) {
+            return route('verification.notice');
+        }
+
+        return RouteServiceProvider::HOME;
+    }
+    protected function authenticated(Request $request, $user)
+    {
+        if (!$user->hasVerifiedEmail()) {
+            Auth::logout(); // Logout the user if email is not verified
+            logger('User attempted login without verifying email: ' . $user->email);
+            return redirect()->route('login')->with('error', 'Please verify your email before logging in.');
+        }
+    
+        logger('User successfully logged in: ' . $user->email);
+        return redirect()->intended($this->redirectPath());
+    }
+    
+
+
 }

@@ -22,6 +22,8 @@ class CreateUsersTable extends Migration
             $table->string('photo')->nullable();
             $table->enum('role',['admin','user'])->default('user');
             $table->string('provider')->nullable();
+            $table->string('phone_number')->nullable();
+            $table->string('id_number')->nullable();
             $table->string('provider_id')->nullable();
             $table->enum('status',['active','inactive'])->default('active');
             $table->rememberToken()->nullable();

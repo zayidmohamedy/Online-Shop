@@ -1,9 +1,11 @@
 <?php
 
+    use App\Http\Controllers\Auth\VerificationController;
     use Illuminate\Support\Facades\Route;
     use Illuminate\Support\Facades\Artisan;
     use App\Http\Controllers\AdminController;
-    use App\Http\Controllers\FrontendController;
+    use App\Http\Controllers\Auth\ConfirmPasswordController;
+     use App\Http\Controllers\FrontendController;
     use App\Http\Controllers\Auth\LoginController;
     use App\Http\Controllers\MessageController;
     use App\Http\Controllers\CartController;
@@ -16,7 +18,10 @@
     use App\Http\Controllers\NotificationController;
     use App\Http\Controllers\HomeController;
     use \UniSharp\LaravelFilemanager\Lfm;
+ 
 
+    use App\Models\User;
+ 
     /*
     |--------------------------------------------------------------------------
     | Web Routes
@@ -35,25 +40,51 @@
         return redirect()->back();
     })->name('cache.clear');
 
+ 
 
     // STORAGE LINKED ROUTE
     Route::get('storage-link',[AdminController::class,'storageLink'])->name('storage.link');
 
-
+    Auth::routes(['verify' => true]);
+   
+    // // Route::get('/email/verify/{id}/{hash}', [FrontendController::class, 'verify'])->name('verification.verify');
+    // Route::post('/email/resend', 'Auth\VerificationController@resend')->name('verification.resend');
+   
     Auth::routes(['register' => false]);
-
-    Route::get('user/login', [FrontendController::class, 'login'])->name('login.form');
-    Route::post('user/login', [FrontendController::class, 'loginSubmit'])->name('login.submit');
-    Route::get('user/logout', [FrontendController::class, 'logout'])->name('user.logout');
-
     Route::get('user/register', [FrontendController::class, 'register'])->name('register.form');
     Route::post('user/register', [FrontendController::class, 'registerSubmit'])->name('register.submit');
+ 
+    Route::get('/password/confirm', [ConfirmPasswordController::class, 'show'])->name('confirmPassword.show');
+    Route::post('/password/confirm', [ConfirmPasswordController::class, 'confirm'])->name('confirmPassword.confirm');
+    
+    Route::get('user/logout', [FrontendController::class, 'logout'])->name('user.logout');
+ 
+Route::middleware(['web', 'auth', 'verified','guest'])->group(function () {
+    // Your routes that require email verification
+    Route::get('user/login', [FrontendController::class, 'login'])->name('login.form');
+    Route::post('user/login', [FrontendController::class, 'loginSubmit'])->name('login.submit');
+});
+
+// Route::group(['namespace' => 'Auth'], function () {
+//     // Your login routes here
+//     Route::get('/login/{provider}', [FrontendController::class, 'login'])->name('login.form');
+//     Route::get('/login/{provider}/callback', [FrontendController::class, 'login'])->name('login.form');
+// });
+    
+     // Handle password reset form submission
+    // Route::middleware(['guest'])->group(function () {
+            Route::get('user/login', [FrontendController::class, 'login'])->name('login.form');
+            Route::post('user/login', [FrontendController::class, 'loginSubmit'])->name('login.submit');
+        // });
+        
+
 // Reset password
     Route::post('password-reset', [FrontendController::class, 'showResetForm'])->name('password.reset');
 // Socialite
     Route::get('login/{provider}/', [LoginController::class, 'redirect'])->name('login.redirect');
     Route::get('login/{provider}/callback/', [LoginController::class, 'Callback'])->name('login.callback');
-
+    
+    
     Route::get('/', [FrontendController::class, 'home'])->name('home');
 
 // Frontend Routes

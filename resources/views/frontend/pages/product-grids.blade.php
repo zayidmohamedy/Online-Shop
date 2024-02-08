@@ -3,6 +3,9 @@
 @section('title','E-SHOP || PRODUCT PAGE')
 
 @section('main-content')
+
+ 
+   
 	<!-- Breadcrumbs -->
     <div class="breadcrumbs">
         <div class="container">
@@ -161,8 +164,10 @@
                             </div>
                         </div>
                         <div class="row">
-                            {{-- {{$products}} --}}
-                            @if(count($products)>0)
+                         @php
+                          $products=DB::table('products')->where('gender_info',"$user_gender")->get(); 
+                         @endphp
+                            <!-- @if(count($products)>1) -->  
                                 @foreach($products as $product)
                                     <div class="col-lg-4 col-md-6 col-12">
                                         <div class="single-product">
@@ -206,10 +211,10 @@
 
                         </div>
                         <div class="row">
-                            <div class="col-md-12 justify-content-center d-flex">
-                                {{$products->appends($_GET)->links()}}
-                            </div>
-                          </div>
+                        <div class="col-md-12 justify-content-center d-flex">
+                      
+                        </div>
+                    </div>
 
                     </div>
                 </div>

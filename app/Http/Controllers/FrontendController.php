@@ -11,12 +11,21 @@ use App\Models\Cart;
 use App\Models\Brand;
 use App\User;
 use Auth;
+use Mail;
 use Session;
 use Newsletter;
 use DB;
 use Hash;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Notifications\VerifyEmail;
+use App\Http\Controllers\Controller;
+use Illuminate\Foundation\Auth\VerifiesEmails;
+use Illuminate\Auth\Events\Verified;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\Access\Response;
+ 
 class FrontendController extends Controller
 {
    
@@ -55,6 +64,7 @@ class FrontendController extends Controller
     }
 
     public function productGrids(){
+        $user_gender = Auth::user()->gender ?? 'male';
         $products=Product::query();
         
         if(!empty($_GET['category'])){
@@ -100,7 +110,7 @@ class FrontendController extends Controller
         // Sort by name , price, category
 
       
-        return view('frontend.pages.product-grids')->with('products',$products)->with('recent_products',$recent_products);
+        return view('frontend.pages.product-grids')->with('products',$products)->with('recent_products',$recent_products)->with('user_gender',$user_gender);
     }
     public function productLists(){
         $products=Product::query();
@@ -349,48 +359,164 @@ class FrontendController extends Controller
     public function login(){
         return view('frontend.pages.login');
     }
-    public function loginSubmit(Request $request){
-        $data= $request->all();
-        if(Auth::attempt(['email' => $data['email'], 'password' => $data['password'],'status'=>'active'])){
-            Session::put('user',$data['email']);
-            request()->session()->flash('success','Successfully login');
-            return redirect()->route('home');
-        }
-        else{
-            request()->session()->flash('error','Invalid email and password pleas try again!');
+    public function loginSubmit(Request $request)
+    {
+        $data = $request->all();
+    
+        $credentials = [
+            'email' => $data['email'],
+            'password' => $data['password'],
+            'status' => 'active',
+        ];
+    
+        // Check if the user exists
+        $user = User::where('email', $data['email'])->first();
+    
+        if (!$user) {
+            request()->session()->flash('error', 'Invalid email. Please try again!');
             return redirect()->back();
         }
-    }
+      // Check if the user has verified their email
+      if (!$user->hasVerifiedEmail()) {
+        // Resend the verification email
+        $user->sendEmailVerificationNotification();
 
-    public function logout(){
+        request()->session()->flash('error', 'Please verify your email. A new verification link has been sent.');
+        return redirect()->back();
+       }
+
+        // Check if the user has verified their email
+        if (!$user->hasVerifiedEmail()) {
+            // Attempt to authenticate the user
+           
+            if (Auth::attempt($credentials)) {
+                // Send email verification notification
+                $user->sendEmailVerificationNotification();
+    
+                // Check if the user has been logged in within the last 2 minutes
+                $lastLogin = $user->email_verified_at;
+                $twoMinutesAgo = Carbon::now()->subMinutes(2);
+    
+                if ($lastLogin && $lastLogin->gt($twoMinutesAgo)) {
+                    // User has logged in within the last 2 minutes, update last login time
+                    $user->email_verified_at = Carbon::now();
+                    $user->save();
+                    Session::put('user', $data['email']);
+                    request()->session()->flash('success', 'You are successfully logged in. Verification link sent.');
+                    return redirect()->route('home');
+                } else {
+                    Auth::logout(); // Logout the user if the last login is more than 2 minutes ago
+                    request()->session()->flash('error', 'Session expired. Verification link sent.');
+                    return redirect()->route('login.form');
+                }
+            } else {
+                request()->session()->flash('error', 'Invalid password. Please try again!');
+                return redirect()->back();
+            }
+        } else {
+            // User is already verified, proceed with the regular login logic
+            if (Auth::attempt($credentials)) {
+                $user->email_verified_at = Carbon::now();
+                $user->save();
+                Session::put('user', $data['email']);
+                request()->session()->flash('success', 'You are successfully logged in.');
+                return redirect()->route('home');
+            } else {
+                request()->session()->flash('error', 'Invalid password. Please try again!');
+                return redirect()->back();
+            }
+        }
+    }
+    
+
+    public function logout()
+    {
+           // Set email_verified_at to null if the user is authenticated
+        if (auth()->check()) {
+            $user = auth()->user();
+            $user->email_verified_at = null;
+            $user->save();
+        }
         Session::forget('user');
         Auth::logout();
-        request()->session()->flash('success','Logout successfully');
-        return back();
+    
+        request()->session()->flash('success', 'Logout successfully');
+        return redirect()->route('home'); // Replace 'home' with your desired redirect route
     }
-
     public function register(){
         return view('frontend.pages.register');
     }
-    public function registerSubmit(Request $request){
-        // return $request->all();
-        $this->validate($request,[
-            'name'=>'string|required|min:2',
-            'email'=>'string|required|unique:users,email',
-            'password'=>'required|min:6|confirmed',
+        public function registerSubmit(Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'string|required|min:2',
+            'email' => 'string|required|unique:users,email',
+            'password' => 'required|min:6|confirmed',
+            'phone_number' => 'required|string',
+            'id_number' => 'required|string|unique:users,id_number',
         ]);
-        $data=$request->all();
-        // dd($data);
-        $check=$this->create($data);
-        Session::put('user',$data['email']);
-        if($check){
-            request()->session()->flash('success','Successfully registered');
+
+        $data = $request->all();
+        $user = $this->create($data);
+
+        // Send email verification notification
+        $user->sendEmailVerificationNotification();
+
+        Session::put('user', $data['email']);
+
+        if ($user) {
+            request()->session()->flash('success', 'Successfully registered. Verification email sent!');
             return redirect()->route('home');
-        }
-        else{
-            request()->session()->flash('error','Please try again!');
+        } else {
+            request()->session()->flash('error', 'Please try again!');
             return back();
         }
+    }
+
+     /**
+     * Mark the authenticated user's email address as verified.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function verify(Request $request)
+{
+    $user = User::find($request->route('id'));
+
+    if (! hash_equals((string) $request->route('hash'), sha1($user->getEmailForVerification()))) {
+        throw new AuthorizationException;
+    }
+
+    if ($user->markEmailAsVerified()) {
+        event(new Verified($user));
+    }
+
+    return redirect($this->redirectPath())->with('verified', true);
+}
+    /**
+     * Confirm the user's account based on the email or other logic.
+     *
+     * @param  string  $email
+     * @return \Illuminate\Http\Response
+     */
+    public function confirmAccount($email)
+    {
+        // Example: Find the user by email and perform account confirmation logic
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found.'], 404);
+        }
+
+        if ($user->is_confirmed) {
+            return response()->json(['message' => 'Account already confirmed.'], 200);
+        }
+
+        // Your account confirmation logic here
+        $user->is_confirmed = true;
+        $user->save();
+
+        return response()->json(['message' => 'Account confirmed successfully.'], 200);
     }
     public function create(array $data){
         return User::create([
@@ -422,5 +548,7 @@ class FrontendController extends Controller
                 return back();
             }
     }
-    
+  
 }
+
+

@@ -2,39 +2,45 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\User;
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Foundation\Auth\ConfirmsPasswords;
+use Illuminate\Http\Request;
+use Illuminate\Auth\Events\Verified;
+use Illuminate\Support\Facades\Hash;
 
 class ConfirmPasswordController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Confirm Password Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller is responsible for handling password confirmations and
-    | uses a simple trait to include the behavior. You're free to explore
-    | this trait and override any functions that require customization.
-    |
-    */
+    // ...
 
-    use ConfirmsPasswords;
-
-    /**
-     * Where to redirect users when the intended url fails.
-     *
-     * @var string
-     */
-    protected $redirectTo = RouteServiceProvider::HOME;
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function confirm(Request $request)
     {
-        $this->middleware('auth');
+        // Example: Find the user by email and perform account confirmation logic
+        $email = $request->input('email');
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found.'], 404);
+        }
+
+        if ($user->is_confirmed) {
+            return response()->json(['message' => 'Account already confirmed.'], 200);
+        }
+
+        // Your account confirmation logic here
+        // Update the email_verified_at column with the current timestamp
+        $user->email_verified_at = now();
+      
+
+        // You may also validate the user's password before confirming
+        if (!Hash::check($request->input('password'), $user->password)) {
+            return response()->json(['error' => 'Invalid password.'], 422);
+        }
+
+        $user->save();
+
+        // Fire the event to indicate that the user has been verified
+        event(new Verified($user));
+
+        return redirect()->route('home'); // Example: Redirect to the dashboard
     }
 }
