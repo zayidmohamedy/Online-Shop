@@ -177,12 +177,17 @@ Route::middleware(['web', 'auth', 'verified','guest'])->group(function () {
         Route::resource('/post-tag', 'PostTagController');
         // Post
         Route::resource('/post', 'PostController');
+        // Example: routes/web.php
+        Route::get('/admin/order/{id}/edit', 'OrderController@edit')->name('admin.order.edit');
+
         // Message
         Route::resource('/message', 'MessageController');
         Route::get('/message/five', [MessageController::class, 'messageFive'])->name('messages.five');
 
         // Order
         Route::resource('/order', 'OrderController');
+        // Route::get('/order/pdf/{id}', 'OrderController@pdf')->name('order.pdf');
+
         // Shipping
         Route::resource('/shipping', 'ShippingController');
         // Coupon

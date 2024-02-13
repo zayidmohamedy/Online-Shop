@@ -169,6 +169,26 @@ class Helper{
         }
         return number_format((float)($price),2,'.','');
     }
+    public static function weeklyEarnings()
+{
+    // Determine the start and end dates of the current week
+    $startOfWeek = now()->startOfWeek();
+    $endOfWeek = now()->endOfWeek();
+
+    // Retrieve orders placed within the current week
+    $weeklyOrders = Order::whereBetween('created_at', [$startOfWeek, $endOfWeek])
+                        ->where('status', 'delivered')
+                        ->get();
+
+    // Calculate the total earnings from the weekly orders
+    $totalEarnings = 0;
+    foreach ($weeklyOrders as $order) {
+        $totalEarnings += $order->total_price;
+    }
+
+    // Return the total earnings for the week
+    return number_format((float)$totalEarnings, 2, '.', '');
+}
 
     public static function shipping(){
         return Shipping::orderBy('id','DESC')->get();

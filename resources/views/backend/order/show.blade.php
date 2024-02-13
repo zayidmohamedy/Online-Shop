@@ -80,7 +80,7 @@
                     </tr>
                     <tr>
                         <td>Shipping Charge</td>
-                        <td> : Tk {{$order->shipping->price}}</td>
+                        <td> : Tk {{$order->shipping->price ?? 50}}</td>
                     </tr>
                     <tr>
                       <td>Coupon</td>

@@ -72,7 +72,7 @@ class PaypalController extends Controller
         // return $response;
   
         if (in_array(strtoupper($response['ACK']), ['SUCCESS', 'SUCCESSWITHWARNING'])) {
-            request()->session()->flash('success','You successfully pay from Paypal! Thank You');
+            request()->session()->flash('success','You have successfully paid through Paypal! Thank You');
             session()->forget('cart');
             session()->forget('coupon');
             return redirect()->route('home');

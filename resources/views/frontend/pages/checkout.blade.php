@@ -30,14 +30,14 @@
 
                         <div class="col-lg-8 col-12">
                             <div class="checkout-form">
-                                <h2>Make Your Checkout Here</h2>
-                                <p>Please register in order to checkout more quickly</p>
+                                <h2>Complete Your Purchase</h2>
+                                <p>Just a few more steps to complete your purchase securely!</p>
                                 <!-- Form -->
                                 <div class="row">
                                     <div class="col-lg-6 col-md-6 col-12">
                                         <div class="form-group">
                                             <label>First Name<span>*</span></label>
-                                            <input type="text" name="first_name" placeholder="" value="{{old('first_name')}}" value="{{old('first_name')}}">
+                                            <input type="text" name="first_name" placeholder="" value="{{old('first_name')}}" value="{{old('first_name')}}" required>
                                             @error('first_name')
                                                 <span class='text-danger'>{{$message}}</span>
                                             @enderror
@@ -46,7 +46,7 @@
                                     <div class="col-lg-6 col-md-6 col-12">
                                         <div class="form-group">
                                             <label>Last Name<span>*</span></label>
-                                            <input type="text" name="last_name" placeholder="" value="{{old('lat_name')}}">
+                                            <input type="text" name="last_name" placeholder="" value="{{old('lat_name')}}" required>
                                             @error('last_name')
                                                 <span class='text-danger'>{{$message}}</span>
                                             @enderror
@@ -55,7 +55,7 @@
                                     <div class="col-lg-6 col-md-6 col-12">
                                         <div class="form-group">
                                             <label>Email Address<span>*</span></label>
-                                            <input type="email" name="email" placeholder="" value="{{old('email')}}">
+                                            <input type="email" name="email" placeholder="" value="{{old('email')}}" required>
                                             @error('email')
                                                 <span class='text-danger'>{{$message}}</span>
                                             @enderror
@@ -73,7 +73,7 @@
                                     <div class="col-lg-6 col-md-6 col-12">
                                         <div class="form-group">
                                             <label>Country<span>*</span></label>
-                                            <select name="country" id="country">
+                                            <select name="country" id="country" required>
                                                 <option value="AF">Afghanistan</option>
                                                 <option value="AX">Åland Islands</option>
                                                 <option value="AL">Albania</option>
@@ -92,7 +92,7 @@
                                                 <option value="AZ">Azerbaijan</option>
                                                 <option value="BS">Bahamas</option>
                                                 <option value="BH">Bahrain</option>
-                                                <option value="BD" selected="selected">Bangladesh</option>
+                                                <option value="BD">Bangladesh</option>
                                                 <option value="BB">Barbados</option>
                                                 <option value="BY">Belarus</option>
                                                 <option value="BE">Belgium</option>
@@ -225,7 +225,7 @@
                                                 <option value="MM">Myanmar [Burma]</option>
                                                 <option value="NA">Namibia</option>
                                                 <option value="NR">Nauru</option>
-                                                <option value="NP" >Nepal</option>
+                                                <option value="NP">Nepal</option>
                                                 <option value="NL">Netherlands</option>
                                                 <option value="AN">Netherlands Antilles</option>
                                                 <option value="NC">New Caledonia</option>
@@ -306,6 +306,7 @@
                                                 <option value="UA">Ukraine</option>
                                                 <option value="AE">United Arab Emirates</option>
                                                 <option value="Uk">United Kingdom</option>
+                                                <option value="US" selected>United States</option>
                                                 <option value="UY">Uruguay</option>
                                                 <option value="UM">U.S. Minor Outlying Islands</option>
                                                 <option value="VI">U.S. Virgin Islands</option>
@@ -358,17 +359,17 @@
                             <div class="order-details">
                                 <!-- Order Widget -->
                                 <div class="single-widget">
-                                    <h2>CART  TOTALS</h2>
+                                    <h2>CART TOTAL</h2>
                                     <div class="content">
                                         <ul>
-										    <li class="order_subtotal" data-price="{{Helper::totalCartPrice()}}">Cart Subtotal<span>Tk{{number_format(Helper::totalCartPrice(),2)}}</span></li>
+										    <li class="order_subtotal" data-price="{{Helper::totalCartPrice()}}">Cart Subtotal<span>${{number_format(Helper::totalCartPrice(),2)}}</span></li>
                                             <li class="shipping">
                                                 Shipping Cost
                                                 @if(count(Helper::shipping())>0 && Helper::cartCount()>0)
-                                                    <select name="shipping" class="nice-select">
+                                                    <select name="shipping" class="nice-select" required>
                                                         <option value="">Select your address</option>
                                                         @foreach(Helper::shipping() as $shipping)
-                                                        <option value="{{$shipping->id}}" class="shippingOption" data-price="{{$shipping->price}}">{{$shipping->type}}: Tk{{$shipping->price}}</option>
+                                                        <option value="{{$shipping->id}}" class="shippingOption" data-price="{{$shipping->price}}">{{$shipping->type}}: ${{$shipping->price}}</option>
                                                         @endforeach
                                                     </select>
                                                 @else 
@@ -377,7 +378,7 @@
                                             </li>
                                             
                                             @if(session('coupon'))
-                                            <li class="coupon_price" data-price="{{session('coupon')['value']}}">You Save<span>Tk{{number_format(session('coupon')['value'],2)}}</span></li>
+                                            <li class="coupon_price" data-price="{{session('coupon')['value']}}">You Save<span>${{number_format(session('coupon')['value'],2)}}</span></li>
                                             @endif
                                             @php
                                                 $total_amount=Helper::totalCartPrice();
@@ -386,9 +387,9 @@
                                                 }
                                             @endphp
                                             @if(session('coupon'))
-                                                <li class="last"  id="order_total_price">Total<span>Tk{{number_format($total_amount,2)}}</span></li>
+                                                <li class="last"  id="order_total_price">Total<span>${{number_format($total_amount,2)}}</span></li>
                                             @else
-                                                <li class="last"  id="order_total_price">Total<span>Tk{{number_format($total_amount,2)}}</span></li>
+                                                <li class="last"  id="order_total_price">Total<span>${{number_format($total_amount,2)}}</span></li>
                                             @endif
                                         </ul>
                                     </div>
@@ -396,17 +397,33 @@
                                 <!--/ End Order Widget -->
                                 <!-- Order Widget -->
                                 <div class="single-widget">
-                                    <h2>Payments</h2>
+                                    <h2>Payment Methods</h2>
                                     <div class="content">
-                                        <div class="checkbox">
-                                            {{-- <label class="checkbox-inline" for="1"><input name="updates" id="1" type="checkbox"> Check Payments</label> --}}
-                                            <form-group>
-                                                <input name="payment_method"  type="radio" value="cod"> <label> Cash On Delivery</label><br>
-                                                <input name="payment_method"  type="radio" value="paypal"> <label> PayPal</label> 
-                                            </form-group>
-                                            
-                                        </div>
-                                    </div>
+    <div class="checkbox">
+        {{-- <label class="checkbox-inline" for="1"><input name="updates" id="1" type="checkbox"> Check Payments</label> --}}
+        <form-group>
+            <input name="payment_method"  type="radio" value="cod" required> <label> Cash On Delivery</label><br>
+            <!-- <input name="payment_method"  type="radio" value="paypal"> <label> PayPal</label><br> -->
+            <input name="payment_method"  type="radio" value="cardpay" required> <label> Card Payment</label><br>
+            
+            <!-- Credit Card Details -->
+            <div id="creditCardDetails" style="display: none;">
+                <label for="cardNumber">Card Number:</label>
+                <input type="text" id="cardNumber" name="card_number" maxlength="16"><br>
+
+                <label for="cardName">Name on Card:</label>
+                <input type="text" id="cardName" name="card_name"><br>
+                
+                <label for="expirationDate">Expiration Date:</label>
+                <input type="text" id="expirationDate" name="expiration_date" maxlength="5"><br>
+                
+                <label for="cvv">CVV:</label>
+                <input type="text" id="cvv" name="cvv" maxlength="3"><br>
+            </div>
+        </form-group>
+    </div>
+</div>
+
                                 </div>
                                 <!--/ End Order Widget -->
                                 <!-- Payment Method Widget -->
@@ -578,5 +595,17 @@
 		});
 
 	</script>
+
+<script>
+    $(document).ready(function() {
+        $('input[name="payment_method"]').change(function() {
+            if ($(this).val() === 'cardpay') {
+                $('#creditCardDetails').show();
+            } else {
+                $('#creditCardDetails').hide();
+            }
+        });
+    });
+</script>
 
 @endpush
