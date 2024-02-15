@@ -3,7 +3,7 @@
       <footer class="sticky-footer bg-white">
         <div class="container my-auto">
           <div class="copyright text-center my-auto">
-          <span>Copyright &copy; <a href="https://github.com/zayidmohamedy"  target="_blank">zayidmohamedy</a> and  <a href="https://github.com/safiyoow"  target="_blank">safiya</a> {{date('Y')}}</span>
+          <span>Copyright &copy;   <span>DIU 56</span> {{date('Y')}}</span>
           </div>
         </div>
       </footer>

@@ -304,4 +304,15 @@ class OrderController extends Controller
         }
         return $data;
     }
+    public function totalAmountLast7Days()
+    {
+        // Call the totalAmountLast7Days method
+        $totalAmountLast7Days = Order::totalAmountLast7Days();
+
+        // Pass the value to your view or do whatever you need
+        return view('backend.index', compact('totalAmountLast7Days'));
+    }
+ 
+ 
+
 }

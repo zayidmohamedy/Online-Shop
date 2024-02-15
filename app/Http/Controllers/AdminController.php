@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Settings;
+use App\Models\Order;
+use App\Models\SalesOrder;
 use App\User;
 use App\Rules\MatchOldPassword;
 use Hash;
@@ -114,4 +116,21 @@ class AdminController extends Controller
     //     $activity= Activity::all();
     //     return view('backend.layouts.activity')->with('activities',$activity);
     // }
+    public function salesorder()
+    {
+        // Call the totalAmountLast7Days method
+        $totalAmountLast7Days = Order::totalAmountLast7Days();
+
+        // Pass the value to your view or do whatever you need
+        return view('backend.index', compact('totalAmountLast7Days'));
+    }
+    public function calculateTotalAmountForOrder()
+    {
+        
+        // Calculate total amount using the calculateTotalAmount method in the Order model
+        $totalAmount = Order::calculateTotalAmountOfAllOrders();
+
+        // Pass the total amount to the backend.index view or do whatever you need
+        return view('backend.index', compact('totalAmount'));
+    }
 }
