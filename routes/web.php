@@ -188,7 +188,7 @@ Route::middleware(['web', 'auth', 'verified','guest'])->group(function () {
         Route::resource('/order', 'OrderController');
         // Route::get('/order/pdf/{id}', 'OrderController@pdf')->name('order.pdf');
         Route::resource('sales-orders', 'SalesOrderController');
-        // Shipping
+        // Shippingphp 
         Route::resource('/shipping', 'ShippingController');
         // Coupon
         Route::resource('/coupon', 'CouponController');
